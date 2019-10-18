@@ -1,0 +1,13 @@
+[
+    {"id": 3, "data": 231, "edgeId": 13},
+    {"id": 5, "data": "foo", "edgeId": 5},
+    {"id": 7, "data": 18.9, "edgeId": 13},
+    {"id": 6, "data": true, "edgeId": 5},
+    {"id": 30, "data": false, "edgeId": 23},
+    {"id": 31, "data": "bar", "edgeId": 52},
+    {"id": 38, "data": "my graph string", "edgeId": 23},
+    {"id": 33, "data": 131, "edgeId": 52},
+    {"id": 2, "data": 8888, "edgeId": 63},
+    {"id": 3, "data": 21.1, "edgeId": 63},
+    {"id": 1, "data": 41.45, "edgeId": 14}
+]

@@ -1,13 +1,17 @@
 ## immutable vertex object for nim
 import system
+import json
 
-type VertexData* = SomeNumber | bool | string | char | seq[string] | seq[SomeNumber]
 
 type
-    Vertex*[T: VertexData] = object
+    Vertex* = object
         id*: uint
-        data*: T
+        data*: json.JsonNode
 
-proc newVertex*[T: VertexData](vid: uint, data: T): Vertex[T] =
+proc newVertex*(vid: uint, data: JsonNode): Vertex =
     ## make a new vertex
-    return Vertex[T](id: vid, data: data)
+    return Vertex(id: vid, data: data)
+
+proc compare2Vertices*(v1: Vertex, v2: Vertex): bool =
+    ## compare the two vertices
+    return bool(v1.id == v2.id and v1.data == v2.data)

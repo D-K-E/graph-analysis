@@ -2,72 +2,59 @@
 from vertex import Vertex, newVertex
 from edge import Edge, newEdge
 from graph import Graph, newGraph
-import json
+import xmltree
+import xmlparser
 
+## read a graphml file and parse it into a graph structure
+#[
+Example GraphML
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d0" for="node" attr.name="color" attr.type="string">
+    <default>yellow</default>
+  </key>
+  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>
+  <graph id="G" edgedefault="undirected">
+    <node id="n0">
+      <data key="d0">green</data>
+    </node>
+    <node id="n1"/>
+    <node id="n2">
+      <data key="d0">blue</data>
+    </node>
+    <node id="n3">
+      <data key="d0">red</data>
+    </node>
+    <node id="n4"/>
+    <node id="n5">
+      <data key="d0">turquoise</data>
+    </node>
+    <edge id="e0" source="n0" target="n2">
+      <data key="d1">1.0</data>
+    </edge>
+    <edge id="e1" source="n0" target="n1">
+      <data key="d1">1.0</data>
+    </edge>
+    <edge id="e2" source="n1" target="n3">
+      <data key="d1">2.0</data>
+    </edge>
+    <edge id="e3" source="n3" target="n2"/>
+    <edge id="e4" source="n2" target="n4"/>
+    <edge id="e5" source="n3" target="n5"/>
+    <edge id="e6" source="n5" target="n4">
+      <data key="d1">1.1</data>
+    </edge>
+  </graph>
+</graphml>
 
-proc sliceJArray(els: JsonNode, startIndex: int,
-                 endIndex: int): seq[JsonNode] =
-    ## slice json array returns a copy
-    for i in countup(startIndex, endIndex):
-        result.add(els[i])
+]#
 
-proc sliceNodeSeq(els: seq[JsonNode], startIndex: int,
-                  endIndex: int): seq[JsonNode] =
-    ## slice json array returns a copy
-    for i in countup(startIndex, endIndex):
-        result.add(els[i])
+proc nodeElement2Vertex(node: XmlNode): Vertex =
+    ## obtain a vertex from node
+    let nodeAttrs = node.attrs()
+    let id: string = nodeAttrs["id"]
+    let data: XmlNode = node.child("data")
 
-
-proc makeVertexFromJGraphElement*(el: JsonNode): Vertex =
-    ## make vertex from json graph element
-    return newVertex(vid = uint(el["id"].getInt()), data = el["data"])
-
-proc makeEdgeFrom2JEl*(el1: JsonNode,
-                      el2: JsonNode): Edge =
-    ## make edge from json graph elements
-    let v1 = makeVertexFromJGraphElement(el1)
-    let v2 = makeVertexFromJGraphElement(el2)
-    return newEdge(v1, v2, uint(el1["edgeId"].getInt()))
-
-proc makeVerticesFromJson*(els: JsonNode): seq[Vertex] =
-    ## make a sequence of vertices from json graph elements
-    assert els.kind == json.JArray
-    var idset: seq[uint]
-    var vertices: seq[Vertex]
-    for el in els.items():
-        let v: Vertex = makeVertexFromJGraphElement(el)
-        if idset.contains(v.id) == false:
-            idset.add(v.id)
-            vertices.add(v)
-    return vertices
-
-proc makeEdgesFromJElements*(els: JsonNode): seq[Edge] =
-    ## make edges from json graph elements
-    assert els.kind == json.JArray
-    var tempEl = els[0]
-    var els = sliceJArray(els, startIndex = 1, endIndex = len(els) - 1)
-    var idset: seq[uint]
-    var edges: seq[Edge]
-    while len(els) > 0:
-        for el in els.items():
-            if el["edgeId"] == tempEl["edgeId"]:
-                var e: Edge = makeEdgeFrom2JEl(el, tempEl)
-                if idset.contains(e.id) == false:
-                    idset.add(e.id)
-                    edges.add(e)
-        tempEl = els[0]
-        els = sliceNodeSeq(els, startIndex = 1, endIndex = len(els) - 1)
-    return edges
-
-proc makeGraphFromJElements*(jgraph: JsonNode): Graph =
-    ## make graph from json graph elements
-    let els: JsonNode = jgraph["data"]
-    let graphId: JsonNode = jgraph["id"]
-    let vertices: seq[Vertex] = makeVerticesFromJson(els)
-    let edges: seq[Edge] = makeEdgesFromJElements(els)
-    return newGraph(edges, vertices, uint(graphId.getInt()))
-
-proc makeGraphFromFile*(filename: string): Graph =
-    ## make graph from json file
-    let jn: JsonNode = json.parseFile(filename)
-    return makeGraphFromJElements(jn)

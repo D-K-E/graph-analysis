@@ -6,10 +6,10 @@ type
     Edge* = object
         v1*: Vertex
         v2*: Vertex
-        id*: uint
+        id*: string
 
 proc newEdge*(vertex1: Vertex,
-              vertex2: Vertex, eid: uint): Edge =
+              vertex2: Vertex, eid: string): Edge =
     ## make a new edge
     return Edge(v1: vertex1, v2: vertex2, id: eid)
 

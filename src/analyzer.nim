@@ -12,25 +12,25 @@ All terminology and formula are taken from
 Reinhard Diestel, Graph Theory, 5th edition, 2017, Springer, Berlin
 ]#
 
-proc findGraphOrder(gr: Graph): int =
+proc findGraphOrder*(gr: Graph): int =
     ## find order of graph ==  number of its vertices
     return len(gr.vertices)
 
-proc findNumberOfVertices(g: Graph): int =
+proc findNumberOfVertices*(g: Graph): int =
     ## find number of vertices
     return findGraphOrder(g)
 
-proc findNumberOfEdges(g: Graph): int =
+proc findNumberOfEdges*(g: Graph): int =
     ## find number of edges in graph
     return len(g.edges)
 
 
-proc getEdgeSetForVertex(gr: Graph, vert: Vertex): seq[Edge] =
+proc getEdgeSetForVertex*(gr: Graph, vert: Vertex): seq[Edge] =
     for e in gr.edges:
         if isVertexIncident(e, vert) == true:
             result.add(e)
 
-proc isGraphComplete(gr: Graph): bool =
+proc isGraphComplete*(gr: Graph): bool =
     ## do all vertices are pairwise adjacent
     for v in gr.vertices:
         var verticeCheck = false

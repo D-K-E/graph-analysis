@@ -1,14 +1,14 @@
 ## immutable vertex object for nim
 import system
 import json
-
+import vdata
 
 type
     Vertex* = object
-        id*: uint
-        data*: json.JsonNode
+        id*: string
+        data*: vdata.VertexData
 
-proc newVertex*(vid: uint, data: JsonNode): Vertex =
+proc newVertex*(vid: string, data: VertexData): Vertex =
     ## make a new vertex
     return Vertex(id: vid, data: data)
 

@@ -8,13 +8,15 @@ type
     Graph* = object
         edges*: seq[Edge]
         vertices*: seq[Vertex]
-        id*: uint
+        id*: string
+        edgeBehaviour*: string
 
 proc newGraph*(es: seq[Edge],
-               vs: seq[Vertex], gid: uint): Graph =
+               vs: seq[Vertex], gid: string,
+               ebehaviour: string = "undirected"): Graph =
     ## make a new graph
     assert len(vs) > 0
-    return Graph(edges: es, vertices: vs, id: gid)
+    return Graph(edges: es, vertices: vs, id: gid, edgeBehaviour: ebehaviour)
 
 proc isVertexContained*(g: Graph, vertex: Vertex): bool =
     ## is vertex contained in the graph

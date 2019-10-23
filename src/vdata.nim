@@ -32,6 +32,29 @@ type
         of VArray:
             elems*: seq[VertexData]
 
+
+proc `$` (x: VertexData): string =
+    return "Vertex data: " & $(x.kind) & $(x)
+
+proc toString*(data: VertexData): string =
+    ## vertex data string representation
+    case data.kind
+    of VString:
+        return $(data.str)
+    of VInt:
+        return $(data.num)
+    of VBool:
+        return $(data.bval)
+    of VFloat:
+        return $(data.fnum)
+    of VNull:
+        return ""
+    of VObject:
+        return $(data.fields)
+    of VArray:
+        return $(data.elems)
+
+
 proc newVNull*(): VertexData =
     # new vertex data as null
     result = VertexData(kind: VNull)
@@ -97,4 +120,3 @@ proc getArray*(node: VertexData, default: seq[VertexData] = @[]): seq[VertexData
     # retrieves vertex array
     if node.isNil or node.kind != VArray: return default
     else: return node.elems
-

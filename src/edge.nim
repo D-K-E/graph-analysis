@@ -1,28 +1,42 @@
 ## immutable edge object for nim
 
 from vertex import Vertex, newVertex, compare2Vertices
+from vdata import VertexData, newVNull, toString
 
 type
     Edge* = object
-        v1*: Vertex
-        v2*: Vertex
+        fromVId*: string
+        toVId*: string
         id*: string
+        data*: VertexData
 
-proc newEdge*(vertex1: Vertex,
-              vertex2: Vertex, eid: string): Edge =
+proc toString*(e: Edge): string =
+    ## string representation of an edge
+    var mess = "Edge: from vertex: " & e.fromVId & ", to " & e.toVId 
+    mess = mess & ", id: " & e.id & ", data: " & toString(e.data)
+    return mess
+
+proc newEdge*(fromVertex: Vertex,
+              toVertex: Vertex,
+              eid: string,
+              data: VertexData = newVNull()): Edge =
     ## make a new edge
-    return Edge(v1: vertex1, v2: vertex2, id: eid)
-
-proc isVertexIncident*(edge: Edge, vertex: Vertex): bool =
-    ## is vertex incident
-    let firstV1Cmp = compare2Vertices(edge.v1, vertex)
-    let firstV2Cmp = compare2Vertices(edge.v2, vertex)
-    return bool(firstV1Cmp or firstV2Cmp)
+    return Edge(fromVId: fromVertex.id,
+                toVId: toVertex.id,
+                id: eid, data: data)
 
 proc compare2Edges*(e1: Edge, e2: Edge): bool =
     ## is edges same
-    let firstV1Cmp = compare2Vertices(e1.v1, e2.v1)
-    let firstV2Cmp = compare2Vertices(e1.v2, e2.v2)
+    let fV1Cmp = bool(e1.fromVId == e2.fromVId)
+    let fV2Cmp = bool(e1.toVId == e2.toVId)
     let idCmp = e1.id == e2.id
-    return bool(firstV1Cmp and firstV2Cmp and idCmp)
+    let dataCmp = e1.data == e2.data
+    return bool(fV1Cmp and fV2Cmp and idCmp and dataCmp)
+
+proc isVertexIncident*(edge: Edge, vertex: Vertex): bool =
+    ## is vertex incident
+    let firstV1Cmp = bool(edge.fromVId == vertex.id)
+    let firstV2Cmp = bool(edge.toVId == vertex.id)
+    return bool(firstV1Cmp or firstV2Cmp)
+
 

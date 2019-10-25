@@ -5,13 +5,9 @@
 import unittest
 import os
 
-from vertex import Vertex, newVertex
-from vertex import compare2Vertices
-from vdata import VertexData, newVString
-from vdata import newVBool, newVNull
-from vdata import toString
-from edge import toString
-from edge import Edge, newEdge, compare2Edges, isVertexIncident
+import vdata
+import vertex
+import edge
 import json
 
 
@@ -33,9 +29,6 @@ suite "Test Edge object":
                       data: newVString("my string"))
         let compe = newEdge(fromVertex = ve1, toVertex = ve2, eid = $(86),
                             data = newVString("my string"))
-        echo "my edges"
-        echo toString(e1)
-        echo toString(compe)
         check(e1 == compe)
 
     test "is vertex incident with edge true":
@@ -55,16 +48,14 @@ suite "Test Edge object":
                       data: newVNull())
         let e2 = newEdge(fromVertex = ve1, toVertex = ve2, eid = $(86),
                             data = newVNull())
-        let compval = compare2Edges(e1, e2)
-        check(compval == true)
+        check(e1 == e2)
 
     test "compare two edges false":
         let e1 = Edge(fromVId: ve1.id, toVId: ve2.id, id: $(86),
                       data: newVNull())
         let e2 = newEdge(fromVertex = ve1, toVertex = ve3, eid = $(86),
                             data = newVNull())
-        let compval = compare2Edges(e1, e2)
-        check(not compval)
+        check(e1 != e2)
 
     echo "-----------------"
     echo "Edge tests ended:"

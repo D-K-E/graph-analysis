@@ -5,9 +5,9 @@
 import unittest
 import os
 
-from vertex import Vertex, newVertex
-from vertex import compare2Vertices
-import json
+import vertex
+import vdata
+import tables
 
 suite "vertex.nim tests":
 
@@ -16,60 +16,62 @@ suite "vertex.nim tests":
     echo "---------------------"
 
     test "Instantiate a vertex as a string":
-        let jdata = newJString("Foo")
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let jdata = newVString("Foo")
+        let v = Vertex(id: $(1), data: jdata)
+        let compv = newVertex(vid = $(1), data = jdata)
         check(v == compv)
 
     test "Instantiate a vertex as an integer":
-        let jdata = newJInt(23)
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let jdata = newVInt(23)
+        let v = Vertex(id: $(1), data: jdata)
+        let compv = newVertex(vid = $(1), data = jdata)
         check(v == compv)
 
     test "Instantiate a vertex as a float":
-        let jdata = newJFloat(23.864)
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let jdata = newVFloat(23.864)
+        let v = Vertex(id: $(1), data: jdata)
+        let compv = newVertex(vid = $(1), data = jdata)
         check(v == compv)
 
     test "Instantiate a vertex as a nil":
-        let jdata = newJNull()
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let jdata = newVNull()
+        let v = Vertex(id: $(1), data: jdata)
+        let compv = newVertex(vid = $(1), data = jdata)
         check(v == compv)
 
     test "Instantiate a vertex as a bool":
-        let jdata = newJBool(true)
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let jdata = newVBool(true)
+        let v = Vertex(id: $(1), data: jdata)
+        let compv = newVertex(vid = $(1), data = jdata)
         check(v == compv)
 
-    test "Instantiate a vertex as a JObject":
-        let jdata = parseJson("""{"key": 3.14}""")
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+    test "Instantiate a vertex as a VObject":
+        var mytable: OrderedTable[string, vdata.VertexData]
+        mytable.add("my key string", newVInt(135))
+        let vd = vdata.newVObject(fs = mytable)
+
+        let v = Vertex(id: $(1), data: vd)
+        let compv = newVertex(vid = $(1), data = vd)
         check(v == compv)
 
     test "Instantiate a vertex as a JArray":
-        let jdata = parseJson("""["a", "b"]""")
-        let v = Vertex(id: 1, data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
+        let vd1 = vdata.newVString(s = "my string")
+        let vd2 = vdata.newVInt(nb = int(1235861))
+        let vd = vdata.newVArray(arr = @[vd1, vd2])
+        let v = Vertex(id: $(1), data: vd)
+        let compv = newVertex(vid = $(1), data = vd)
         check(v == compv)
 
     test "check compare 2 vertices true":
-        let jdata = parseJson("""["a", "b"]""")
-        let v = Vertex(id: uint(1), data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
-        let compb = compare2Vertices(v, compv)
-        check(compb)
+        let vd1 = vdata.newVString(s = "my string")
+        let vd2 = vdata.newVInt(nb = int(1235861))
+        let vd = vdata.newVArray(arr = @[vd1, vd2])
 
-    test "check compare 2 vertices false":
-        let jdata = parseJson("""["a", "b"]""")
-        let v = Vertex(id: uint(5), data: jdata)
-        let compv = newVertex(vid = uint(1), data = jdata)
-        let compb = compare2Vertices(v, compv)
-        check(not compb)
+        let v1 = Vertex(id: $(1), data: vd)
+        let v2 = Vertex(id: $(2), data: vd)
+        let compv = newVertex(vid = $(1), data = vd)
+        check(v1 == compv)
+        check(v2 != compv)
 
     echo "-------------------"
     echo "Vertex tests ended:"

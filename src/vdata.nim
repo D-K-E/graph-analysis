@@ -3,6 +3,7 @@
 # mimicks json from standard module
 
 import tables
+import hashes
 
 type
     VertexDataKind* = enum ## enum object for holding vertex data
@@ -32,6 +33,7 @@ type
         of VArray:
             elems*: seq[VertexData]
 
+## basic operators
 
 proc `$` (x: VertexData): string =
     return "Vertex data: " & $(x.kind) & $(x)
@@ -54,6 +56,57 @@ proc toString*(data: VertexData): string =
     of VArray:
         return $(data.elems)
 
+proc `==`*(a, b: VertexData): bool =
+    ## compare two vertex data
+    if a.isNil:
+        if b.isNil: return true
+        return false
+    elif b.isNil or a.kind != b.kind:
+        return false
+    else:
+        case a.kind
+        of VString:
+            result = a.str == b.str
+        of VInt:
+            result = a.num == b.num
+        of VFloat:
+            result = a.fnum == b.fnum
+        of VBool:
+            result = a.bval == b.bval
+        of VNull:
+            result = true
+        of VArray:
+            result = a.elems == b.elems
+        of VObject:
+            if a.fields.len() != b.fields.len(): return false
+            for key, val in a.fields:
+                if not b.fields.hasKey(key): return false
+                if b.fields[key] != val: return false
+            result = true
+
+proc len*(data: VertexData): int =
+    ## return length of data
+    case data.kind
+    of VArray: return data.elems.len()
+    of VObject: return data.fields.len()
+    of VString: return data.str.len()
+    else: return 0
+
+proc hash*(data: VertexData): Hash =
+    ## hash vertex data
+    case data.kind
+    of VArray: return hash(data.elems)
+    of VObject:
+        var h: Hash = 0
+        for key, val in data.fields:
+            h = h !& hash(key)
+            h = h !& hash(val)
+        return !$h
+    of VInt: return hash(data.num)
+    of VFloat: return hash(data.fnum)
+    of VBool: return hash(data.bval)
+    of VNull: return !$0
+    of VString: return hash(data.str)
 
 proc newVNull*(): VertexData =
     # new vertex data as null

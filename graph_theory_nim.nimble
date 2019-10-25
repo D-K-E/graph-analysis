@@ -40,3 +40,10 @@ task testAnalyzer, "Runs analyzer tests":
 task testVdata, "Runs vdata tests":
     exec "nim c -r tests/testVData.nim"
     exec "rm tests/testVData"
+
+task testConstructs, "Runs vdata, vertex, edge, graph tests":
+    exec "nimble testVertex"
+    exec "nimble testVdata"
+    exec "nimble testEdge"
+    exec "nimble testGraph"
+    echo "All Done"

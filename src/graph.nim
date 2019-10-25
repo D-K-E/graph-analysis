@@ -1,90 +1,75 @@
 ## immutable graph object for nim
 
-from edge import Edge, compare2Edges
-from vertex import Vertex, compare2Vertices
-from system import newException, ValueError
+import system
+import sets
+import edge
+import vertex
+import vdata
+import hashes
 
 type
     Graph* = object
-        edges*: seq[Edge]
-        vertices*: seq[Vertex]
+        edges*: HashSet[Edge]
+        vertices*: HashSet[Vertex]
         id*: string
         edgeBehaviour*: string
 
-proc newGraph*(es: seq[Edge],
-               vs: seq[Vertex], gid: string,
+proc hash*(g: Graph): Hash =
+    ## hash graph
+    var h: Hash = 0
+    for e in g.edges.items():
+        h = h !& hash(e)
+    for v in g.vertices.items():
+        h = h !& hash(v)
+    return !$h
+
+proc newGraph*(es: HashSet[Edge],
+               vs: HashSet[Vertex], gid: string,
                ebehaviour: string = "undirected"): Graph =
     ## make a new graph
-    assert len(vs) > 0
+    assert vs.len() > 0
     return Graph(edges: es, vertices: vs, id: gid, edgeBehaviour: ebehaviour)
-
-
-proc getIndexOfVertexById*(g: Graph, vid: string): int =
-    ## get index of vertice 0, or positive if it exists
-    ## -1 if it does not exist.
-    for i in countup(0, g.vertices.len() - 1):
-        if g.vertices[i].id == vid:
-            return i
-    return -1
 
 proc getVertexById*(g: Graph, vid: string): Vertex =
     ## obtain vertex using id
-    let index: int = getIndexOfVertexById(g, vid)
-    if index < 0:
-        raise newException(ValueError,
-                           "Vertex Id: " & vid & " not in vertices of graph")
-    return g.vertices[index]
-
-proc getIndexOfEdgeById*(g: Graph, eid: string): int =
-    ## obtain index of edge
-    for i in countup(0, g.edges.len() - 1):
-        if g.edges[i].id == eid:
-            return i
-    return -1
+    for vertex in g.vertices:
+        if vertex.id == vid:
+            return vertex
+    raise newException(ValueError,
+                       "Vertex Id: " & vid & " not in vertices of graph")
 
 proc getEdgeById*(g: Graph, eid: string): Edge =
     ## obtain edge using edge id
-    let index: int = getIndexOfEdgeById(g, eid)
-    if index < 0:
-        raise newException(ValueError,
-                           "Vertex Id: " & eid & " not in vertices of graph")
-    return g.edges[index]
+    for edge in g.edges:
+        if edge.id == eid:
+            return edge
+    #
+    raise newException(ValueError,
+                       "Vertex Id: " & eid & " not in vertices of graph")
 
+proc contains*(g: Graph, v: Vertex): bool =
+    ## contains a vertex or not
+    return g.vertices.contains(v)
 
-proc isVertexContained*(g: Graph, vertex: Vertex): bool =
-    ## is vertex contained in the graph
-    let index: int = getIndexOfVertexById(g, vertex.id)
-    return index < 0
-
-
-proc areVerticesContained*(g: Graph, vertices: seq[Vertex]): bool =
-    ## are vertices contained in the graph
-    for v in vertices:
-        if isVertexContained(g, v) == false:
+proc contains*(g: Graph, vs: HashSet[Vertex]): bool =
+    ## contains a vertex set or not
+    for v in vs:
+        if contains(g, v) == false:
             return false
     return true
 
-proc isEdgeContained*(g: Graph, edge: Edge): bool =
-    ## is edge contained in graph
-    let index: int = getIndexOfEdgeById(g, edge.id)
-    return index < 0
+proc contains*(g: Graph, edge: Edge): bool =
+    ## contains an edge or not
+    return g.edges.contains(edge)
 
-
-proc areEdgesContained*(g: Graph, edges: seq[Edge]): bool =
-    ## are edges contained in graph
-    for e in edges:
-        if isEdgeContained(g, e) == false:
+proc contains*(g: Graph, es: HashSet[Edge]): bool =
+    ## contains an edge set or not
+    for e in es:
+        if contains(g, e) == false:
             return false
     return true
 
-proc compare2Graphs4Equality*(g1: Graph, g2: Graph): bool =
+
+proc `==`*(g1: Graph, g2: Graph): bool =
     ## compare two graphs for equality of vertices and edges
-    if len(g1.vertices) != len(g2.vertices):
-        return false
-    if areVerticesContained(g1, g2.vertices) == false:
-        return false
-    if areEdgesContained(g1, g2.edges) == false:
-        return false
-    return true
-
-
+    return bool(g1.vertices == g2.vertices and g1.edges == g2.edges)

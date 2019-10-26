@@ -1,13 +1,3 @@
-## maker of graph, vertex, edge
-from vertex import Vertex, newVertex
-from edge import Edge, newEdge
-from graph import Graph, newGraph
-import xmltree
-import xmlparser
-
-## read a graphml file and parse it into a graph structure
-#[
-Example GraphML
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns"  
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -49,20 +39,3 @@ Example GraphML
     </edge>
   </graph>
 </graphml>
-
-]#
-
-proc getNodeKeyVal(node: XmlNode, tname: string, 
-                   attrname: string): seq[XmlNode] =
-    ## get node key value
-    for keytag in node.findAll(tname, caseInsensitive = true):
-        if keytag.attr("for") == attrname:
-            result.add(keytag)
-
-proc getNodeKeys*(node: XmlNode): seq[XmlNode] =
-    ## get keys that are for node
-    return getNodeKeyVal(node, tname = "key", attrname = "node")
-    
-proc getEdgeKeys*(node: XmlNode): seq[XmlNode] =
-    ## get keys that are for node
-    return getNodeKeyVal(node, tname = "key", attrname = "edge")

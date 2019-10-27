@@ -120,6 +120,24 @@ suite "test vdata.nim":
         check(vd13 == vd14)
         check(vd1 != vd14)
 
+    test "test flatten vertex table":
+        let vd1 = newVBool(true)
+        let vd2 = newVBool(false)
+        let vd3 = newVString("foo")
+        let vd4 = newVString("bar")
+        var dtable = initOrderedTable[string, seq[VertexData]]()
+        dtable.add("m1", @[vd1, vd2, vd4])
+        dtable.add("m2", @[vd3, vd2, vd2])
+        dtable.add("m3", @[vd1, vd4, vd4])
+        let vt = flattenVTable(dtable)
+        var ctable = initOrderedTable[string, VertexData]()
+        ctable.add("m1", newVArray(@[vd1, vd2, vd4]))
+        ctable.add("m2", newVArray(@[vd3, vd2, vd2]))
+        ctable.add("m3", newVArray(@[vd1, vd4, vd4]))
+        let ct = newVObject(ctable)
+        check(ct == vt)
+
+
     echo "-----------------------"
     echo "VertexData tests ended:"
     echo "-----------------------"

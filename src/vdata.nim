@@ -4,6 +4,7 @@
 
 import tables
 import hashes
+from strutils import removeSuffix
 
 type
     VertexDataKind* = enum ## enum object for holding vertex data
@@ -34,10 +35,6 @@ type
             elems*: seq[VertexData]
 
 ## basic operators
-
-proc `$` (x: VertexData): string =
-    return "Vertex data: " & $(x.kind) & $(x)
-
 proc toString*(data: VertexData): string =
     ## vertex data string representation
     case data.kind
@@ -52,9 +49,23 @@ proc toString*(data: VertexData): string =
     of VNull:
         return ""
     of VObject:
-        return $(data.fields)
+        var vstr = "{"
+        for key, val in data.fields.pairs():
+            vstr.add("(" & key & ", " & toString(val) & ")")
+        vstr.add("}")
+        return vstr
     of VArray:
-        return $(data.elems)
+        var vstr = "["
+        for val in data.elems:
+            vstr.add(toString(val) & ", ")
+        vstr.removeSuffix({',', ' '})
+        vstr.add("]")
+        return vstr
+
+proc `$`*(x: VertexData): string =
+    return "Vertex data: " & x.toString()
+
+
 
 proc `==`*(a, b: VertexData): bool =
     ## compare two vertex data
@@ -137,6 +148,40 @@ proc newVArray*(arr: seq[VertexData]): VertexData =
     # new vertex data as array
     result = VertexData(kind: VArray, elems: arr)
 
+## some helper functions
+
+proc flattenVTable*(dTable: OrderedTable[string, seq[VertexData]]): VertexData =
+    ## flatten vertex data table
+    var ntable = initOrderedTable[string, VertexData]()
+    for name, varray in dtable.pairs():
+        let vd = newVArray(varray)
+        ntable[name] = vd
+    return newVObject(ntable)
+
+proc newVData*(arr: seq[VertexData]): VertexData = 
+    result = newVArray(arr)
+
+proc newVData*(s: string): VertexData =
+    result = newVString(s)
+
+proc newVData*(f: float): VertexData =
+    result = newVFloat(f)
+
+proc newVData*(fs: OrderedTable[string, VertexData]): VertexData =
+    result = newVObject(fs)
+
+proc newVData*(bv: bool): VertexData =
+    result = newVBool(bv)
+
+proc newVData*(nb: int): VertexData =
+    result = newVInt(nb)
+
+proc newVData*(nb: uint): VertexData =
+    result = newVInt(int(nb))
+
+proc newVData*(fs: OrderedTable[string, seq[VertexData]): VertexData =
+    result = flattenVTable(fs)
+
 proc getStr*(node: VertexData, default: string = ""): string =
     # retrieves text
     if node.isNil or node.kind != VString: return default
@@ -173,3 +218,5 @@ proc getArray*(node: VertexData, default: seq[VertexData] = @[]): seq[VertexData
     # retrieves vertex array
     if node.isNil or node.kind != VArray: return default
     else: return node.elems
+
+

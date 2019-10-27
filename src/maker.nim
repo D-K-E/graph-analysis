@@ -2,6 +2,8 @@
 from vertex import Vertex, newVertex
 from edge import Edge, newEdge
 from graph import Graph, newGraph
+import tables
+import vdata
 import xmltree
 import xmlparser
 
@@ -66,3 +68,57 @@ proc getNodeKeys*(node: XmlNode): seq[XmlNode] =
 proc getEdgeKeys*(node: XmlNode): seq[XmlNode] =
     ## get keys that are for node
     return getNodeKeyVal(node, tname = "key", attrname = "edge")
+
+proc getNodeKeyById*(dataNode: XmlNode, keyNodes: seq[XmlNode]): XmlNode =
+    ## get node key by using id
+    let idstr = dataNode.attr("key")
+    for keyNode in keyNodes:
+        let nodeId = keyNode.attr("id")
+        if nodeId == idstr:
+            return keyNode
+    raise newException(ValueError, idstr & " is not found in keys")
+
+
+proc castDataType*(node: XmlNode, key: XmlNode): VertexData =
+    ## from key get attribute type and cast it to vertex data
+    let nodeText = node.text()
+    let dataType = node.attr("attr.type")
+    let vd: VertexData
+    case dataType 
+    of "double":
+        let temp = float(dataType)
+        let vd: VertexData = newVFloat(temp)
+    of "float":
+        let temp = float(dataType)
+        let vd: VertexData = newVFloat(temp)
+    of "int":
+        let temp = int(dataType)
+        let vd: VertexData = newVInt(temp)
+    of "long":
+        let temp = BiggestInt(dataType)
+        let vd: VertexData = newVInt(temp)
+    of "boolean":
+        let temp = bool(dataType)
+        let vd: VertexData = newVBool(temp)
+    of "string":
+        let temp = string(dataType)
+        let vd: VertexData = newVString(temp)
+    else:
+        raise newException(ValueError, dataType & " is unknown attribute type")
+    return vd
+
+proc getEdgeData*(edgeNode: XmlNode, edgeKeys: seq[XmlNode]): VertexData =
+    ## create edge data
+    var dataNodes: seq[XmlNode]
+    edgeNode.findAll("data", dataNodes)
+    if dataNodes.len() == 0:
+        return newVNull()
+    var dataTable = initOrderedTable[string, seq[VertexData]]()
+    for dataNode in dataNodes:
+        let keyNode = getNodeKeyById(dataNode, edgeKeys)
+        let keyName = keyNode.attr("attr.name")
+        let keyVData = castDataType(dataNode, keyNode)
+        dataTable[keyName].add(keyVData)
+    return flattenVTable(dataTable)
+
+

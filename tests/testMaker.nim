@@ -6,8 +6,10 @@ import os
 #from maker import makeGraphFromFile
 import maker
 import vdata
+import edge
 import xmlparser
 import xmltree
+import tables
 
 suite "maker.nim tests":
 
@@ -39,6 +41,36 @@ suite "maker.nim tests":
     test "test get node key by id":
         let mynode = xmlparser.loadXml(gpath2)
         let nodeKeys = maker.getNodeKeys(mynode)
+        let cmpnode1 = xmlparser.parseXml("<key id='d0' for='node' attr.name='color' attr.type='string'><default>yellow</default></key>")
+        let cmpnode2 = xmlparser.parseXml("<data key='d0'>green</data>")
+        let resnode = maker.getNodeKeyById(cmpnode2, nodeKeys)
+        check($(resnode) == $(cmpnode1))
+
+    test "cast data type node 2 vertex data float":
+
+        let keyNode = xmlparser.parseXml(
+            "<key id='d1' for='node' attr.name='weight' attr.type='double'><default>yellow</default></key>"
+        )
+        let dataNode = xmlparser.parseXml("<data key='d1'>1.0</data>")
+        let myvdata = newVData(1.0)
+        echo myvdata
+        let cmpdata = castDataType(dataNode, keyNode)
+        check(myvdata == cmpdata)
+
+
+#   test "get edge from edge node":
+#       let mynode = xmlparser.loadXml(gpath2)
+#       let nodes = maker.getEdgeKeys(mynode)
+#       let mess = "<edge id='e1' source='n0' target='n1'><data"
+#       let mess2 = mess & " key='d1'>1.0</data></edge>"
+#       let edgenode = xmlparser.parseXml(mess2)
+#       let myedge = maker.getEdgeFromEdgeNode(edgenode, keys = nodes)
+#       var edata = initOrderedTable[string, seq[vdata.VertexData]]()
+#       let myseq = @[newVFloat(1.0)]
+#       edata["d1"] = myseq
+#       let cmpedge = edge.Edge(fromVId: "n0", toVId: "n1",
+#                               id: "e1", data: vdata.newVData(edata))
+#       check(myedge == cmpedge)
 
     echo "------------------"
     echo "Maker tests ended:"

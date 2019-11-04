@@ -45,6 +45,10 @@ proc newEdge*(fromVertex: Vertex,
                 toVId: toVertex.id,
                 id: eid, data: data)
 
+proc newEdge*(fromVertex: string, toVertex: string, eid: string,
+              data: VertexData = newVNull()): Edge =
+    return Edge(fromVId: fromVertex, toVId: toVertex, id: eid, data: data)
+
 proc isVertexIncident*(edge: Edge, vertex: Vertex): bool =
     ## is vertex incident
     let firstV1Cmp = bool(edge.fromVId == vertex.id)

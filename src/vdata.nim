@@ -179,7 +179,7 @@ proc newVData*(nb: int): VertexData =
 proc newVData*(nb: uint): VertexData =
     result = newVInt(int(nb))
 
-proc newVData*(fs: OrderedTable[string, seq[VertexData]): VertexData =
+proc newVData*(fs: OrderedTable[string, seq[VertexData]]): VertexData =
     result = flattenVTable(fs)
 
 proc getStr*(node: VertexData, default: string = ""): string =

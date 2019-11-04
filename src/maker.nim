@@ -6,6 +6,7 @@ import tables
 import vdata
 import xmltree
 import xmlparser
+from strutils import parseFloat, parseInt, parseBiggestInt, parseBool
 
 ## read a graphml file and parse it into a graph structure
 #[
@@ -54,7 +55,7 @@ Example GraphML
 
 ]#
 
-proc getNodeKeyVal(node: XmlNode, tname: string, 
+proc getNodeKeyVal(node: XmlNode, tname: string,
                    attrname: string): seq[XmlNode] =
     ## get node key value
     for keytag in node.findAll(tname, caseInsensitive = true):
@@ -64,9 +65,9 @@ proc getNodeKeyVal(node: XmlNode, tname: string,
 proc getNodeKeys*(node: XmlNode): seq[XmlNode] =
     ## get keys that are for node
     return getNodeKeyVal(node, tname = "key", attrname = "node")
-    
+
 proc getEdgeKeys*(node: XmlNode): seq[XmlNode] =
-    ## get keys that are for node
+    ## get keys that are for edge
     return getNodeKeyVal(node, tname = "key", attrname = "edge")
 
 proc getNodeKeyById*(dataNode: XmlNode, keyNodes: seq[XmlNode]): XmlNode =
@@ -81,44 +82,75 @@ proc getNodeKeyById*(dataNode: XmlNode, keyNodes: seq[XmlNode]): XmlNode =
 
 proc castDataType*(node: XmlNode, key: XmlNode): VertexData =
     ## from key get attribute type and cast it to vertex data
-    let nodeText = node.text()
-    let dataType = node.attr("attr.type")
-    let vd: VertexData
-    case dataType 
+    let nodeText = innerText(node)
+    let dataType = key.attr("attr.type")
+    var vd: VertexData
+    case dataType
     of "double":
-        let temp = float(dataType)
+        let temp = parseFloat(nodeText)
         let vd: VertexData = newVFloat(temp)
+        return vd
     of "float":
-        let temp = float(dataType)
+        let temp = parseFloat(nodeText)
         let vd: VertexData = newVFloat(temp)
+        return vd
     of "int":
-        let temp = int(dataType)
+        let temp = parseInt(nodeText)
         let vd: VertexData = newVInt(temp)
+        return vd
     of "long":
-        let temp = BiggestInt(dataType)
+        let temp = parseBiggestInt(nodeText)
         let vd: VertexData = newVInt(temp)
+        return vd
     of "boolean":
-        let temp = bool(dataType)
+        let temp = parseBool(nodeText)
         let vd: VertexData = newVBool(temp)
+        return vd
     of "string":
-        let temp = string(dataType)
+        let temp = $(nodeText)
         let vd: VertexData = newVString(temp)
+        return vd
     else:
         raise newException(ValueError, dataType & " is unknown attribute type")
-    return vd
+    return newVNull()
 
-proc getEdgeData*(edgeNode: XmlNode, edgeKeys: seq[XmlNode]): VertexData =
+proc getNodeEdgeData*(edgeNode: XmlNode, nodeEdgeKeys: seq[
+        XmlNode]): VertexData =
     ## create edge data
     var dataNodes: seq[XmlNode]
     edgeNode.findAll("data", dataNodes)
     if dataNodes.len() == 0:
         return newVNull()
     var dataTable = initOrderedTable[string, seq[VertexData]]()
+    echo dataNodes
+    echo nodeEdgeKeys
     for dataNode in dataNodes:
-        let keyNode = getNodeKeyById(dataNode, edgeKeys)
+        let keyNode = getNodeKeyById(dataNode, nodeEdgeKeys)
         let keyName = keyNode.attr("attr.name")
-        let keyVData = castDataType(dataNode, keyNode)
-        dataTable[keyName].add(keyVData)
+        let keyVData: vdata.VertexData = castDataType(dataNode, keyNode)
+        if dataTable.hasKey(keyName) == true:
+            dataTable[keyName].add(keyVData)
+        else:
+            dataTable[keyName] = @[keyVData]
+        echo dataTable
+    echo dataTable
     return flattenVTable(dataTable)
+
+proc getEdgeFromEdgeNode*(edgeNode: XmlNode, keys: seq[XmlNode]): Edge =
+    let edgeData = getNodeEdgeData(edgeNode, keys)
+    let eid: string = edgeNode.attr("id")
+    let source: string = edgeNode.attr("source")
+    let target: string = edgeNode.attr("target")
+    return Edge(fromVId: source, toVId: target, id: eid,
+            data: edgeData)
+
+proc getEdgesFromGraphEl(graphEl: XmlNode): seq[Edge] =
+    ## get edges from graph element
+    let edgeKeys = getEdgeKeys(graphEl)
+    var edgeNodes: seq[XmlNode]
+    for el in graphEl:
+        if el.tag() == "edge":
+            let edge = getEdgeFromEdgeNode(el, edgeKeys)
+            result.add(edge)
 
 

@@ -2,6 +2,7 @@
 from vertex import Vertex, newVertex
 from edge import Edge, newEdge
 from graph import Graph, newGraph
+import sets # for hash set
 import tables
 import vdata
 import xmltree
@@ -122,8 +123,6 @@ proc getNodeEdgeData*(edgeNode: XmlNode, nodeEdgeKeys: seq[
     if dataNodes.len() == 0:
         return newVNull()
     var dataTable = initOrderedTable[string, seq[VertexData]]()
-    echo dataNodes
-    echo nodeEdgeKeys
     for dataNode in dataNodes:
         let keyNode = getNodeKeyById(dataNode, nodeEdgeKeys)
         let keyName = keyNode.attr("attr.name")
@@ -132,11 +131,10 @@ proc getNodeEdgeData*(edgeNode: XmlNode, nodeEdgeKeys: seq[
             dataTable[keyName].add(keyVData)
         else:
             dataTable[keyName] = @[keyVData]
-        echo dataTable
-    echo dataTable
     return flattenVTable(dataTable)
 
 proc getEdgeFromEdgeNode*(edgeNode: XmlNode, keys: seq[XmlNode]): Edge =
+    ## get edge from edge xml
     let edgeData = getNodeEdgeData(edgeNode, keys)
     let eid: string = edgeNode.attr("id")
     let source: string = edgeNode.attr("source")
@@ -144,13 +142,42 @@ proc getEdgeFromEdgeNode*(edgeNode: XmlNode, keys: seq[XmlNode]): Edge =
     return Edge(fromVId: source, toVId: target, id: eid,
             data: edgeData)
 
-proc getEdgesFromGraphEl(graphEl: XmlNode): seq[Edge] =
+proc getNodeFromNodeEl*(nodeEl: XmlNode, keys: seq[XmlNode]): Vertex =
+    ## get node from node element
+    let nodeData = getNodeEdgeData(nodeEl, keys)
+    let vid: string = nodeEl.attr("id")
+    return Vertex(id: vid, data: nodeData)
+
+proc getEdgesFromGraphEl(mainNode: XmlNode): seq[Edge] =
     ## get edges from graph element
-    let edgeKeys = getEdgeKeys(graphEl)
+    let graphEl = mainNode.child("graph")
+    let edgeKeys = getEdgeKeys(mainNode)
     var edgeNodes: seq[XmlNode]
     for el in graphEl:
         if el.tag() == "edge":
             let edge = getEdgeFromEdgeNode(el, edgeKeys)
             result.add(edge)
+
+proc getNodesFromGraphEl(mainNode: XmlNode): seq[Vertex] =
+    ## get vertices from graph element
+    let graphEl = mainNode.child("graph")
+    let vkeys = getNodeKeys(mainNode)
+    var nodeEls: seq[XmlNode]
+    for el in graphEl:
+        if el.tag() == "node":
+            let vert = getNodeFromNodeEl(el, vkeys)
+            result.add(vert)
+
+proc makeGraphFromGraphEl*(graphEl: XmlNode): Graph =
+    ## make graph from graph element of graph ML
+    let vertices = getNodesFromGraphEl(graphEl)
+    let edges = getEdgesFromGraphEl(graphEl)
+    let graphElement = graphEl.child("graph")
+    let gid = graphElement.attr("id")
+    let ebehaviour = graphElement.attr("edgedefault")
+    echo "gid"
+    echo gid
+    return Graph(edges: toHashSet(edges), vertices: toHashSet(vertices),
+    id: gid, edgeBehaviour: ebehaviour)
 
 

@@ -2,6 +2,11 @@
 Graph Analysis
 ################
 
+Build status: 
+
+.. image:: https://travis-ci.com/D-K-E/graph-analysis.svg?branch=master
+    :target: https://travis-ci.com/D-K-E/graph-analysis
+
 A repo on analysis of graphs as in graph theory.
 
 The goal is to concentrate on analysis rather than io. A small subset of
@@ -26,3 +31,6 @@ Here are the current set of functions defined in analyzer:
 
 - check if a given graph is a proper subgraph of another graph
 - check if a given graph is a subgraph of another graph
+
+- Hypergraph structure is also added. Some extensions to graphml for dealing
+  with directed hypergraphs are also added.

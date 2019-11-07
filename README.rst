@@ -2,8 +2,6 @@
 Graph Analysis
 ################
 
-Build status: 
-
 .. image:: https://travis-ci.com/D-K-E/graph-analysis.svg?branch=master
     :target: https://travis-ci.com/D-K-E/graph-analysis
 

@@ -175,9 +175,15 @@ proc makeGraphFromGraphEl*(graphEl: XmlNode): Graph =
     let graphElement = graphEl.child("graph")
     let gid = graphElement.attr("id")
     let ebehaviour = graphElement.attr("edgedefault")
-    echo "gid"
-    echo gid
     return Graph(edges: toHashSet(edges), vertices: toHashSet(vertices),
     id: gid, edgeBehaviour: ebehaviour)
 
+proc makeGraphFromFile*(filepath: string): Graph =
+    ## make graph from xml path
+    let graphXmlNode = loadXml(filepath)
+    return makeGraphFromGraphEl(graphXmlNode)
 
+proc makeGraphFromStr*(xmlstr: string): Graph =
+    ## make graph from xml string
+    let graphXmlNode = parseXml(xmlstr)
+    return makeGraphFromGraphEl(graphXmlNode)

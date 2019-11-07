@@ -2,9 +2,9 @@
 # license: see, LICENSE
 ## an aggregate of functions for analysing a graph
 import graph
-from vertex import Vertex
-from edge import Edge
-from edge import isVertexIncident
+import vertex
+import edge
+import vdata
 import sets
 
 #[
@@ -26,16 +26,18 @@ proc findNumberOfEdges*(g: Graph): int =
 
 
 proc getEdgeSetForVertex*(gr: Graph, vert: Vertex): HashSet[Edge] =
+    var edgeSet = initHashSet[Edge]()
     for e in gr.edges:
         if isVertexIncident(e, vert) == true:
-            result.incl(e)
+            edgeSet.incl(e)
+    return edgeSet
 
 proc isGraphComplete*(gr: Graph): bool =
     ## do all vertices are pairwise adjacent
     for v in gr.vertices:
         var verticeCheck = false
         for e in gr.edges:
-            if isVertexIncident(e, v) == true:
+            if edge.isVertexIncident(e, v) == true:
                 verticeCheck = true
                 break
         if verticeCheck == false:

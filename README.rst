@@ -11,11 +11,12 @@ The goal is to concentrate on analysis rather than io. A small subset of
 GraphML format is assumed for specification of graphs. You can find a sample
 of it in tests folder. All graphs are immutable once they are created.
 Functions are going to be documented and referenced as they are added. Very
-experimental stuff do not put anywhere near production code.
+experimental stuff. 
+Check if a function is tested before adopting it from tests directory.
 
 Currently almost all functionality deals with undirected graphs.
 
-Here are the current set of functions defined in analyzer:
+Here are the current set of functions defined in analyzer that are tested:
 
 - find order
 

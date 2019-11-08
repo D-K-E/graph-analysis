@@ -122,6 +122,13 @@ proc isInducedSubgraph*(g1: Graph, subGraph: Graph): bool =
     let sg = getSpanningGraph(g1, vs)
     return sg == subGraph
 
+proc isSpanningSubGraph*(g1: Graph, subGraph: Graph): bool =
+    ## does subGraph span G or not
+    if isInducedSubgraph(g1, subGraph) == false:
+        # G' ⊆ G
+        return false
+    return bool(subGraph.vertices == g1.vertices)
+
 proc symmetricVertexDiff(g: Graph, vset: HashSet[Vertex]): HashSet[Vertex] =
     ## symmetric vertex difference
     ## vertices that are not part of intersection.

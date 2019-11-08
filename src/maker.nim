@@ -1,3 +1,7 @@
+## module documentation for ``maker.nim``
+#[
+## Responsible for all io related functionality
+]#
 ## maker of graph, vertex, edge
 from vertex import Vertex, newVertex
 from edge import Edge, newEdge
@@ -9,7 +13,7 @@ import xmltree  # move around in xml tree
 import xmlparser  # parse xml, load xml
 from strutils import parseFloat, parseInt, parseBiggestInt, parseBool
 
-## read a graphml file and parse it into a graph structure
+# read a graphml file and parse it into a graph structure
 
 proc getNodeKeyVal(node: XmlNode, tname: string,
                    attrname: string): seq[XmlNode] =

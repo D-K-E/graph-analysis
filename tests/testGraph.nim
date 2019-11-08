@@ -33,10 +33,10 @@ suite "graph.nim tests":
     test "Instantiate a Graph":
         let edata = toHashSet[Edge]([e1, e2])
         let vdata1 = toHashSet[Vertex]([ve1, ve2, ve3, ve4])
-        
+
         let myg = Graph(edges: edata,
                         vertices: vdata1,
-                        id: $(63))
+                        id: $(63), edgeBehaviour: "undirected")
         let compg = newGraph(es = edata,
                              vs = vdata1,
                              gid = $(63))
@@ -112,7 +112,7 @@ suite "graph.nim tests":
     test "compare a Graph with another graph true":
         let myg = Graph(edges: toHashSet([e1, e2]),
                         vertices: toHashSet([ve1, ve2, ve3, ve4]),
-                        id: $(63))
+                        id: $(63), edgeBehaviour: "undirected")
         let compg = newGraph(es = toHashSet([e1, e2]),
                              vs = toHashSet([ve1, ve2, ve3, ve4]),
                              gid = $(63))

@@ -1,3 +1,4 @@
+## This is documentation for module vdata.nim
 # author: Kaan Eraslan
 # license: see, LICENSE
 # mimicks json from standard module

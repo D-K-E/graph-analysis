@@ -1,3 +1,4 @@
+## ``graph.nim`` module documentation
 ## immutable graph object for nim
 
 import system
@@ -47,6 +48,26 @@ proc getEdgeById*(g: Graph, eid: string): Edge =
     raise newException(ValueError,
                        "Vertex Id: " & eid & " not in vertices of graph")
 
+proc contains*(g: Graph, id: string, isVertex: bool): bool =
+    # check if graph contains a vertex or edge by id
+    if isVertex == true:
+        result = true
+        try:
+            let v = getVertexById(g, id)
+        except ValueError:
+            result = false
+        except:
+            raise
+    else:
+        result = true
+        try:
+            let e = getEdgeById(g, id)
+        except ValueError:
+            result = false
+        except:
+            raise
+
+
 proc contains*(g: Graph, v: Vertex): bool =
     ## contains a vertex or not
     return g.vertices.contains(v)
@@ -69,7 +90,14 @@ proc contains*(g: Graph, es: HashSet[Edge]): bool =
             return false
     return true
 
+proc contains*(g1: Graph, g2: Graph): bool =
+    ## contains other graph or not
+    return bool(g1.contains(g2.vertices) and g1.contains(g2.edges))
+
 
 proc `==`*(g1: Graph, g2: Graph): bool =
     ## compare two graphs for equality of vertices and edges
-    return bool(g1.vertices == g2.vertices and g1.edges == g2.edges)
+    let cond1 = g1.vertices == g2.vertices
+    let cond2 = g1.edges == g2.edges
+    let cond3 = g1.edgeBehaviour == g2.edgeBehaviour
+    return bool(cond1 and cond2 and cond3)

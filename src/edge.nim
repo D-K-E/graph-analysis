@@ -1,3 +1,4 @@
+## module documentation for ``edge.nim``
 ## immutable edge object for nim
 
 from vertex import Vertex, newVertex

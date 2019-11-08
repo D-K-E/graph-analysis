@@ -47,3 +47,42 @@ task testConstructs, "Runs vdata, vertex, edge, graph tests":
     exec "nimble testEdge"
     exec "nimble testGraph"
     echo "All Done"
+
+
+task makeEdgeDoc, "generates documentation for edge.nim":
+    exec "nim doc src/edge.nim"
+    exec "mv edge.html docs/edge.html"
+
+
+task makeVertexDoc, "generates documentation for vertex.nim":
+    exec "nim doc src/vertex.nim"
+    exec "mv vertex.html docs/vertex.html"
+
+task makeGraphDoc, "generates documentation for graph.nim":
+    exec "nim doc src/graph.nim"
+    exec "mv graph.html docs/graph.html"
+
+task makeVdataDoc, "generates documentation for vdata.nim":
+    exec "nim doc src/vdata.nim"
+    exec "mv vdata.html docs/vdata.html"
+
+task makeHyperedgeDoc, "generates documentation for hyperedge.nim":
+    exec "nim doc src/hyperedge.nim"
+    exec "mv hyperedge.html docs/hyperedge.html"
+
+task makeMakerDoc, "generates documentation for maker.nim":
+    exec "nim doc src/maker.nim"
+    exec "mv maker.html docs/maker.html"
+
+task makeAnalyzerDoc, "generates documentation for analyzer.nim":
+    exec "nim doc src/analyzer.nim"
+    exec "mv analyzer.html docs/analyzer.html"
+
+task makeDocs, "generates documentation for source files":
+    exec "nimble makeVdataDoc"
+    exec "nimble makeVertexDoc"
+    exec "nimble makeEdgeDoc"
+    exec "nimble makeGraphDoc"
+    exec "nimble makeHyperedgeDoc"
+    exec "nimble makeMakerDoc"
+    exec "nimble makeAnalyzerDoc"

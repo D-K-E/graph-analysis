@@ -20,8 +20,9 @@ suite "maker.nim tests":
 
     let cdir: string = os.getCurrentDir()
     let tdir: string = os.joinPath(cdir, "tests")
-    let gpath1: string = os.joinPath(tdir, "graphml-test.xml")
-    let gpath2: string = os.joinPath(tdir, "graphml-test-2.xml")
+    let gdir: string = os.joinPath(tdir, "graphs")
+    let gpath1: string = os.joinPath(gdir, "graphml-test.xml")
+    let gpath2: string = os.joinPath(gdir, "graphml-test-2.xml")
     assert os.fileExists(gpath1)
     assert os.fileExists(gpath2)
 
@@ -96,8 +97,12 @@ suite "maker.nim tests":
 
     test "test make graph":
         let mynode = xmlparser.loadXml(gpath2)
-        let grph = maker.makeGraphFromGraphEl(mynode)
-        echo grph
+        var check1 = true
+        try:
+            let grph = maker.makeGraphFromGraphEl(mynode)
+        except:
+            check1 = false
+        check(check1 == true)
 
 
     echo "------------------"

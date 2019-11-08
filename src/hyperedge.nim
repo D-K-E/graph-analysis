@@ -1,4 +1,5 @@
 ## immutable hyperedge object for nim
+## still very experimental
 
 from vertex import Vertex, newVertex
 import vdata
